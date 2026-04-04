@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyBuddy - AI Study Companion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Theme Settings Panel -->
+  <div id="theme-panel" class="theme-panel">
+    <div class="theme-panel-header">
+      <h3>Customize Theme</h3>
+      <button id="close-theme-panel" class="icon-btn" aria-label="Close theme panel">&times;</button>
+    </div>
+ 
+    <div class="theme-section">
+      <h4>Preset Themes</h4>
+      <div class="preset-grid">
+        <button class="preset-btn active" data-theme="light">
+          <span class="preset-preview light-preview"></span>
+          <span>Light</span>
+        </button>
+        <button class="preset-btn" data-theme="dark">
+          <span class="preset-preview dark-preview"></span>
+          <span>Dark</span>
+        </button>
+        <button class="preset-btn" data-theme="soft-pink">
+          <span class="preset-preview pink-preview"></span>
+          <span>Soft Pink</span>
+        </button>
+        <button class="preset-btn" data-theme="forest">
+          <span class="preset-preview forest-preview"></span>
+          <span>Forest Green</span>
+        </button>
+        <button class="preset-btn" data-theme="midnight">
+          <span class="preset-preview midnight-preview"></span>
+          <span>Midnight Blue</span>
+        </button>
+        <button class="preset-btn" data-theme="sunset">
+          <span class="preset-preview sunset-preview"></span>
+          <span>Sunset</span>
+        </button>
+      </div>
+    </div>
+ 
+    <div class="theme-section">
+      <h4>Background Style</h4>
+      <div class="bg-options">
+        <button class="bg-btn active" data-bg="solid">Solid</button>
+        <button class="bg-btn" data-bg="gradient">Gradient</button>
+        <button class="bg-btn" data-bg="library">Cozy Library</button>
+        <button class="bg-btn" data-bg="coffee">Coffee Shop</button>
+        <button class="bg-btn" data-bg="stars">Starry Night</button>
+      </div>
+    </div>
+ 
+    <div class="theme-section">
+      <h4>Custom Colors</h4>
+      <div class="color-pickers">
+        <label>
+          Accent Color
+          <input type="color" id="accent-color" value="#6366f1">
+        </label>
+        <label>
+          Background Color
+          <input type="color" id="bg-color" value="#f8fafc">
+        </label>
+        <label>
+          Text Color
+          <input type="color" id="text-color" value="#1e293b">
+        </label>
+      </div>
+    </div>
+ 
+    <div class="theme-section">
+      <h4>Font Size</h4>
+      <div class="font-size-control">
+        <button id="font-decrease" class="font-btn">A-</button>
+        <span id="font-size-label">16px</span>
+        <button id="font-increase" class="font-btn">A+</button>
+      </div>
+    </div>
+ 
+    <button id="reset-theme" class="reset-btn">Reset to Default</button>
+  </div>
+ 
+  <!-- Main App -->
+  <div class="app-container">
+    <header>
+      <div class="header-content">
+        <h1>StudyBuddy</h1>
+        <p class="tagline">Explain. Practice. Learn.</p>
+      </div>
+      <button id="theme-toggle" class="icon-btn theme-icon" aria-label="Open theme settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </header>
+ 
+    <!-- API Key Setup -->
+    <div id="api-setup" class="card api-setup">
+      <h2>Get Started</h2>
+      <p>Enter your Claude API key to power the AI features. Your key stays in your browser and is never sent anywhere except Anthropic's API.</p>
+      <div class="api-input-group">
+        <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+        <button id="save-api-key" class="btn primary">Save Key</button>
+      </div>
+      <p class="hint">Get your API key at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></p>
+    </div>
+ 
+    <!-- Step 1: Topic Input -->
+    <div id="step-explain" class="card step">
+      <h2>What do you want to learn?</h2>
+      <p>Type a topic or paste your notes, and I'll explain it in plain language.</p>
+      <textarea id="topic-input" placeholder="e.g. How does photosynthesis work? or paste your class notes here..." rows="4"></textarea>
+      <button id="explain-btn" class="btn primary">Explain This to Me</button>
+    </div>
+ 
+    <!-- Explanation Display -->
+    <div id="step-explanation" class="card step hidden">
+      <div class="step-header">
+        <h2>Here's the Explanation</h2>
+        <button id="new-topic-btn" class="btn secondary small">New Topic</button>
+      </div>
+      <div id="explanation-content" class="content-area"></div>
+      <button id="quiz-btn" class="btn primary">Test My Knowledge</button>
+    </div>
+ 
+    <!-- Quiz Section -->
+    <div id="step-quiz" class="card step hidden">
+      <div class="step-header">
+        <h2>Practice Questions</h2>
+        <div class="quiz-progress">
+          <span id="question-counter">Question 1 of 5</span>
+        </div>
+      </div>
+      <div id="quiz-content">
+        <p id="question-text" class="question-text"></p>
+        <div id="choices" class="choices"></div>
+      </div>
+      <div id="feedback-area" class="feedback hidden"></div>
+      <button id="next-question-btn" class="btn primary hidden">Next Question</button>
+    </div>
+ 
+    <!-- Results Section -->
+    <div id="step-results" class="card step hidden">
+      <h2>Your Results</h2>
+      <div id="score-display" class="score-display"></div>
+      <div id="results-breakdown" class="results-breakdown"></div>
+      <div class="results-actions">
+        <button id="retry-quiz-btn" class="btn secondary">Try Again</button>
+        <button id="new-topic-btn-2" class="btn primary">Study Something New</button>
+      </div>
+    </div>
+ 
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p id="loading-text">Thinking...</p>
+    </div>
+  </div>
+ 
+  <script src="app.js"></script>
+</body>
+</html>
