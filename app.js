@@ -188,6 +188,7 @@ function handlePhotoSelected(e) {
       capturedImageMediaType = header.match(/data:([^;]+)/)[1];
       $('#photo-preview').src = jpegDataUrl;
       $('#photo-preview-wrap').classList.remove('hidden');
+      $('#topic-input').closest('.textarea-wrap').classList.add('has-photo');
       $('#camera-btn').style.background = 'var(--accent)';
       $('#camera-btn').style.color = '#fff';
     };
@@ -201,6 +202,7 @@ function clearPhoto() {
   capturedImageMediaType = null;
   $('#photo-input').value = '';
   $('#photo-preview-wrap').classList.add('hidden');
+  $('#topic-input').closest('.textarea-wrap').classList.remove('has-photo');
   $('#camera-btn').style.background = '';
   $('#camera-btn').style.color = '';
 }

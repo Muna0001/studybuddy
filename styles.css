@@ -721,6 +721,10 @@
     margin-bottom: 0;
   }
 
+  .textarea-wrap.has-photo textarea {
+    padding-bottom: 76px;
+  }
+
   .camera-icon-btn {
     position: absolute;
     bottom: 10px;
@@ -743,10 +747,11 @@
   }
 
   .photo-preview-wrap {
-    position: relative;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
     display: inline-flex;
     align-items: center;
-    margin-bottom: 8px;
   }
 
   .photo-preview {
