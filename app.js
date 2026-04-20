@@ -164,32 +164,42 @@ window.addEventListener('popstate', (e) => {
 
 // ---- Photo Handling ----
 
-async function handlePhotoSelected(e) {
-  let file = e.target.files[0];
+function handlePhotoSelected(e) {
+  const file = e.target.files[0];
   if (!file) return;
 
-  const isHeic = file.type === 'image/heic' || file.type === 'image/heif'
-    || /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
-
-  if (isHeic && typeof heic2any !== 'undefined') {
-    try {
-      const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
-      file = new File([blob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
-    } catch (err) {
-      console.warn('HEIC conversion failed:', err);
-    }
-  }
-
-  processImageFile(file);
-}
-
-function processImageFile(file) {
   const objectUrl = URL.createObjectURL(file);
-  $('#photo-preview').src = objectUrl;
+  const preview = $('#photo-preview');
+
+  // Show thumbnail area immediately
   $('#photo-preview-wrap').classList.remove('hidden');
   $('#camera-btn').classList.add('hidden');
   $('#topic-input').closest('.textarea-wrap').classList.add('has-photo');
 
+  preview.onerror = async () => {
+    // Browser can't display this format (e.g. HEIC on Chrome) — convert via heic2any
+    preview.onerror = null;
+    URL.revokeObjectURL(objectUrl);
+    if (typeof heic2any === 'undefined') return;
+    try {
+      const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+      const convertedUrl = URL.createObjectURL(blob);
+      preview.src = convertedUrl;
+      prepareForApi(blob, convertedUrl);
+    } catch (err) {
+      console.warn('HEIC conversion failed:', err);
+    }
+  };
+
+  preview.onload = () => {
+    preview.onload = null;
+    prepareForApi(file, objectUrl);
+  };
+
+  preview.src = objectUrl;
+}
+
+function prepareForApi(file, objectUrl) {
   const img = new Image();
   img.onload = () => {
     const MAX = 1600;
