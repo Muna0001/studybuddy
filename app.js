@@ -73,6 +73,7 @@ function init() {
  
 function bindEvents() {
   saveApiKeyBtn.addEventListener('click', handleSaveApiKey);
+  $('#clear-api-key').addEventListener('click', handleClearApiKey);
   explainBtn.addEventListener('click', handleExplain);
   quizBtn.addEventListener('click', handleGenerateQuiz);
   newTopicBtn.addEventListener('click', resetToStart);
@@ -138,6 +139,17 @@ function bindEvents() {
   });
 }
  
+function handleClearApiKey() {
+  apiKey = '';
+  localStorage.removeItem('studybuddy_api_key');
+  apiKeyInput.value = '';
+  apiSetup.classList.remove('hidden');
+  stepExplain.classList.add('hidden');
+  stepExplanation.classList.add('hidden');
+  stepQuiz.classList.add('hidden');
+  stepResults.classList.add('hidden');
+}
+
 // ---- Photo Handling ----
 
 function handlePhotoSelected(e) {
