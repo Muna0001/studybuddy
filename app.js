@@ -171,10 +171,17 @@ function handlePhotoSelected(e) {
   reader.onload = (ev) => {
     const img = new Image();
     img.onload = () => {
+      const MAX = 1600;
+      let w = img.naturalWidth;
+      let h = img.naturalHeight;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      canvas.getContext('2d').drawImage(img, 0, 0);
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.9);
       capturedImageBase64 = jpegDataUrl.split(',')[1];
       capturedImageMediaType = 'image/jpeg';
