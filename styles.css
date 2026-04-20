@@ -700,19 +700,24 @@
    
   .custom-bg-pill {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     padding: 0;
     cursor: pointer;
+    width: 100px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
   .custom-bg-pill #custom-bg-label {
-    display: block;
-    padding: 6px 12px;
+    font-size: 0.82em;
   }
 
   .custom-bg-thumb {
-    width: 64px;
-    height: 28px;
+    position: absolute;
+    inset: 0;
     border-radius: 20px;
     overflow: hidden;
   }
