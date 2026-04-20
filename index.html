@@ -118,13 +118,13 @@
       <p>Type a topic, paste notes, or take a photo of your textbook or homework.</p>
       <div class="textarea-wrap">
         <textarea id="topic-input" placeholder="e.g. How does photosynthesis work? or paste your class notes here..." rows="4"></textarea>
+        <label id="camera-btn" for="photo-input" class="camera-icon-btn" title="Add photo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </label>
         <div id="photo-preview-wrap" class="photo-preview-wrap hidden">
           <img id="photo-preview" class="photo-preview" alt="Photo preview">
           <button id="remove-photo-btn" class="remove-photo-btn" type="button" aria-label="Remove photo">&times;</button>
         </div>
-        <label id="camera-btn" for="photo-input" class="camera-icon-btn" title="Add photo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </label>
         <input type="file" id="photo-input" accept="image/*" class="hidden">
       </div>
       <button id="explain-btn" class="btn primary">Explain This to Me</button>

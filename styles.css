@@ -722,7 +722,7 @@
   }
 
   .textarea-wrap.has-photo textarea {
-    padding-bottom: 92px;
+    padding-bottom: 52px;
   }
 
   .camera-icon-btn {
@@ -749,7 +749,7 @@
   .photo-preview-wrap {
     position: absolute;
     bottom: 14px;
-    left: 14px;
+    right: 14px;
     display: inline-flex;
     align-items: center;
   }
