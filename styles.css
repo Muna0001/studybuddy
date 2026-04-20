@@ -711,25 +711,42 @@
 
   /* ---- Photo capture ---- */
 
-  .photo-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 8px;
+  .textarea-wrap {
+    position: relative;
+    margin-bottom: 8px;
   }
 
-  .icon-text-btn {
-    display: inline-flex;
+  .textarea-wrap textarea {
+    padding-bottom: 40px;
+    margin-bottom: 0;
+  }
+
+  .camera-icon-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    display: flex;
     align-items: center;
-    gap: 6px;
-    white-space: nowrap;
+    justify-content: center;
     cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .camera-icon-btn:hover {
+    background: var(--accent);
+    color: #fff;
   }
 
   .photo-preview-wrap {
     position: relative;
     display: inline-flex;
     align-items: center;
+    margin-bottom: 8px;
   }
 
   .photo-preview {
