@@ -640,6 +640,7 @@ function updateCustomBgPill() {
   const hasBg = !!localStorage.getItem('studybuddy_custom_bg');
   $('#custom-bg-label').classList.toggle('hidden', hasBg);
   $('#custom-bg-thumb').classList.toggle('hidden', !hasBg);
+  $('#remove-custom-bg').classList.toggle('hidden', !hasBg);
   if (hasBg) {
     $('#custom-bg-preview').src = localStorage.getItem('studybuddy_custom_bg');
   }
