@@ -717,18 +717,18 @@
   }
 
   .textarea-wrap textarea {
-    padding-bottom: 40px;
+    padding-bottom: 52px;
     margin-bottom: 0;
   }
 
   .textarea-wrap.has-photo textarea {
-    padding-bottom: 76px;
+    padding-bottom: 92px;
   }
 
   .camera-icon-btn {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    bottom: 14px;
+    right: 14px;
     width: 32px;
     height: 32px;
     border-radius: 6px;
@@ -748,8 +748,8 @@
 
   .photo-preview-wrap {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    bottom: 14px;
+    left: 14px;
     display: inline-flex;
     align-items: center;
   }
