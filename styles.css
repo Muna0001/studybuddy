@@ -703,11 +703,8 @@
     overflow: visible;
     padding: 0;
     cursor: pointer;
-    width: 100px;
+    width: 64px;
     height: 35px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     flex-shrink: 0;
   }
 
@@ -742,6 +739,10 @@
     align-items: center;
     justify-content: center;
     z-index: 1;
+  }
+
+  .upload-bg-btn {
+    cursor: pointer;
   }
 
   .api-key-btn {

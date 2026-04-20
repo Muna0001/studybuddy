@@ -47,19 +47,14 @@
  
     <div class="theme-section">
       <h4>Background Style</h4>
-      <div class="bg-options">
+      <div class="bg-options" id="bg-options">
         <button class="bg-btn active" data-bg="solid">Solid</button>
         <button class="bg-btn" data-bg="gradient">Gradient</button>
         <button class="bg-btn" data-bg="library">Cozy Library</button>
         <button class="bg-btn" data-bg="coffee">Coffee Shop</button>
         <button class="bg-btn" data-bg="stars">Starry Night</button>
-        <label id="custom-bg-btn" for="bg-upload" class="bg-btn custom-bg-pill">
-          <span id="custom-bg-label">Upload Image</span>
-          <div id="custom-bg-thumb" class="custom-bg-thumb hidden">
-            <img id="custom-bg-preview" alt="background preview">
-          </div>
-          <button id="remove-custom-bg" type="button" class="custom-bg-remove hidden" aria-label="Remove">&times;</button>
-        </label>
+        <!-- custom image pills inserted here by JS -->
+        <label id="upload-bg-btn" for="bg-upload" class="bg-btn upload-bg-btn">+ Upload</label>
         <input type="file" id="bg-upload" accept="image/*" class="hidden">
       </div>
     </div>

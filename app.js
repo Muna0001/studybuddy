@@ -94,13 +94,14 @@ function bindEvents() {
     });
   });
  
-  // Background styles
-  $$('.bg-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      $$('.bg-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      applyBackground(btn.dataset.bg);
-    });
+  // Background styles — delegation handles dynamic custom pills too
+  $('#bg-options').addEventListener('click', (e) => {
+    if (e.target.closest('#upload-bg-btn')) return;
+    const btn = e.target.closest('[data-bg]');
+    if (!btn) return;
+    $$('.bg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyBackground(btn.dataset.bg);
   });
  
   // Custom colors
@@ -120,11 +121,6 @@ function bindEvents() {
  
   // Custom background upload
   $('#bg-upload').addEventListener('change', handleBgUpload);
-  $('#remove-custom-bg').addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    removeCustomBg();
-  });
 
   // Reset theme
   $('#reset-theme').addEventListener('click', resetTheme);
@@ -589,60 +585,95 @@ function applyPresetTheme(themeName) {
   saveTheme(themeName);
 }
  
+let customBgs = JSON.parse(localStorage.getItem('studybuddy_custom_bgs') || '[]');
+
+function saveCustomBgs() {
+  try {
+    localStorage.setItem('studybuddy_custom_bgs', JSON.stringify(customBgs));
+  } catch {
+    alert('Storage full. Try removing some background images first.');
+  }
+}
+
+function renderCustomBgPills() {
+  const uploadBtn = $('#upload-bg-btn');
+  document.querySelectorAll('.custom-bg-pill').forEach(el => el.remove());
+  customBgs.forEach((dataUrl, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'bg-btn custom-bg-pill';
+    pill.dataset.bg = `custom-${i}`;
+    pill.innerHTML = `
+      <div class="custom-bg-thumb">
+        <img src="${dataUrl}" alt="background ${i + 1}">
+      </div>
+      <button type="button" class="custom-bg-remove" data-index="${i}" aria-label="Remove">&times;</button>
+    `;
+    pill.querySelector('.custom-bg-remove').addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeCustomBg(i);
+    });
+    uploadBtn.parentNode.insertBefore(pill, uploadBtn);
+  });
+}
+
 function applyBackground(bgType) {
-  document.body.classList.remove('bg-gradient', 'bg-library', 'bg-coffee', 'bg-stars', 'bg-custom');
-  if (bgType === 'custom') {
-    const saved = localStorage.getItem('studybuddy_custom_bg');
-    if (saved) {
-      document.body.style.backgroundImage = `url(${saved})`;
+  document.body.classList.remove('bg-gradient', 'bg-library', 'bg-coffee', 'bg-stars');
+  if (bgType && bgType.startsWith('custom-')) {
+    const index = parseInt(bgType.split('-')[1]);
+    const dataUrl = customBgs[index];
+    if (dataUrl) {
+      document.body.style.backgroundImage = `url(${dataUrl})`;
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
       document.body.style.backgroundAttachment = 'fixed';
-      document.body.classList.add('bg-custom');
     }
   } else {
     document.body.style.backgroundImage = '';
     document.body.style.backgroundSize = '';
     document.body.style.backgroundPosition = '';
     document.body.style.backgroundAttachment = '';
-    if (bgType !== 'solid') document.body.classList.add('bg-' + bgType);
+    if (bgType && bgType !== 'solid') document.body.classList.add('bg-' + bgType);
   }
   localStorage.setItem('studybuddy_bg', bgType);
-  updateCustomBgPill();
 }
 
 function handleBgUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      localStorage.setItem('studybuddy_custom_bg', ev.target.result);
-    } catch {
-      alert('Image is too large to save. Please try a smaller image.');
-      return;
-    }
-    $$('.bg-btn').forEach(b => b.classList.remove('active'));
-    $('#custom-bg-btn').classList.add('active');
-    applyBackground('custom');
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeCustomBg() {
-  localStorage.removeItem('studybuddy_custom_bg');
   $('#bg-upload').value = '';
-  $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'solid'));
-  applyBackground('solid');
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  img.onload = () => {
+    const MAX = 1200;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+    URL.revokeObjectURL(objectUrl);
+    customBgs.push(dataUrl);
+    saveCustomBgs();
+    renderCustomBgPills();
+    const newBg = `custom-${customBgs.length - 1}`;
+    $$('.bg-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-bg="${newBg}"]`).classList.add('active');
+    applyBackground(newBg);
+  };
+  img.src = objectUrl;
 }
 
-function updateCustomBgPill() {
-  const hasBg = !!localStorage.getItem('studybuddy_custom_bg');
-  $('#custom-bg-label').classList.toggle('hidden', hasBg);
-  $('#custom-bg-thumb').classList.toggle('hidden', !hasBg);
-  $('#remove-custom-bg').classList.toggle('hidden', !hasBg);
-  if (hasBg) {
-    $('#custom-bg-preview').src = localStorage.getItem('studybuddy_custom_bg');
+function removeCustomBg(index) {
+  const activeBg = localStorage.getItem('studybuddy_bg');
+  customBgs.splice(index, 1);
+  saveCustomBgs();
+  renderCustomBgPills();
+  if (activeBg === `custom-${index}` || (activeBg && activeBg.startsWith('custom-') && parseInt(activeBg.split('-')[1]) >= customBgs.length)) {
+    $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'solid'));
+    applyBackground('solid');
   }
 }
  
@@ -716,22 +747,26 @@ function loadTheme() {
     } catch (e) { /* ignore */ }
   }
  
-  // Load background
+  // Load custom bg images and render pills first
+  renderCustomBgPills();
+
+  // Load active background
   const savedBg = localStorage.getItem('studybuddy_bg');
   if (savedBg) {
     applyBackground(savedBg);
     $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === savedBg));
   }
-  updateCustomBgPill();
 }
  
 function resetTheme() {
   localStorage.removeItem('studybuddy_theme');
   localStorage.removeItem('studybuddy_custom_colors');
   localStorage.removeItem('studybuddy_bg');
-  localStorage.removeItem('studybuddy_custom_bg');
+  localStorage.removeItem('studybuddy_custom_bgs');
   localStorage.removeItem('studybuddy_font_size');
- 
+  customBgs = [];
+  renderCustomBgPills();
+
   fontSize = 16;
   applyFontSize();
   applyPresetTheme('light');
