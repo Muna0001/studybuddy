@@ -140,6 +140,8 @@ function bindEvents() {
 }
  
 function handleClearApiKey() {
+  const previousKey = apiKey;
+  history.pushState({ apiChange: true, previousKey }, '');
   apiKey = '';
   localStorage.removeItem('studybuddy_api_key');
   apiKeyInput.value = '';
@@ -149,6 +151,15 @@ function handleClearApiKey() {
   stepQuiz.classList.add('hidden');
   stepResults.classList.add('hidden');
 }
+
+window.addEventListener('popstate', (e) => {
+  if (e.state?.apiChange && e.state.previousKey) {
+    apiKey = e.state.previousKey;
+    localStorage.setItem('studybuddy_api_key', apiKey);
+    apiSetup.classList.add('hidden');
+    stepExplain.classList.remove('hidden');
+  }
+});
 
 // ---- Photo Handling ----
 
