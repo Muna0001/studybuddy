@@ -14,6 +14,8 @@ let questions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let fontSize = parseInt(localStorage.getItem('studybuddy_font_size')) || 16;
+let capturedImageBase64 = null;
+let capturedImageMediaType = null;
  
 // ---- DOM Elements ----
  
@@ -118,6 +120,11 @@ function bindEvents() {
   // Reset theme
   $('#reset-theme').addEventListener('click', resetTheme);
  
+  // Camera / photo upload
+  $('#camera-btn').addEventListener('click', () => $('#photo-input').click());
+  $('#photo-input').addEventListener('change', handlePhotoSelected);
+  $('#remove-photo-btn').addEventListener('click', clearPhoto);
+
   // Enter key on textarea
   topicInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -132,6 +139,33 @@ function bindEvents() {
   });
 }
  
+// ---- Photo Handling ----
+
+function handlePhotoSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    const [meta, base64] = dataUrl.split(',');
+    capturedImageBase64 = base64;
+    capturedImageMediaType = file.type || 'image/jpeg';
+    $('#photo-preview').src = dataUrl;
+    $('#photo-preview-wrap').classList.remove('hidden');
+    $('#camera-btn').textContent = '';
+    $('#camera-btn').insertAdjacentHTML('afterbegin', `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Change Photo`);
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto() {
+  capturedImageBase64 = null;
+  capturedImageMediaType = null;
+  $('#photo-input').value = '';
+  $('#photo-preview-wrap').classList.add('hidden');
+  $('#camera-btn').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Add Photo`;
+}
+
 // ---- API Key ----
  
 function handleSaveApiKey() {
@@ -145,7 +179,17 @@ function handleSaveApiKey() {
  
 // ---- Claude API Call ----
  
-async function callClaude(systemPrompt, userMessage) {
+async function callClaude(systemPrompt, userMessage, imageBase64 = null, imageMediaType = null) {
+  let content;
+  if (imageBase64) {
+    content = [
+      { type: 'image', source: { type: 'base64', media_type: imageMediaType, data: imageBase64 } },
+      { type: 'text', text: userMessage }
+    ];
+  } else {
+    content = userMessage;
+  }
+
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -158,7 +202,7 @@ async function callClaude(systemPrompt, userMessage) {
       model: CLAUDE_MODEL,
       max_tokens: 2048,
       system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }]
+      messages: [{ role: 'user', content }]
     })
   });
  
@@ -178,16 +222,20 @@ async function callClaude(systemPrompt, userMessage) {
  
 async function handleExplain() {
   const topic = topicInput.value.trim();
-  if (!topic) return;
- 
-  currentTopic = topic;
+  if (!topic && !capturedImageBase64) return;
+
+  currentTopic = topic || 'the content in the photo';
   showLoading('Breaking it down for you...');
   explainBtn.disabled = true;
- 
+
   try {
     const systemPrompt = `You are a friendly, patient study tutor. Your job is to explain topics in clear, simple language that anyone can understand. Use short paragraphs, bullet points where helpful, and real-world analogies. Avoid jargon unless you immediately define it. Write in a warm, encouraging tone. Format your response in HTML using <p>, <ul>, <li>, <ol>, and <strong> tags for structure.`;
- 
-    const explanation = await callClaude(systemPrompt, `Please explain this topic to me in a clear and simple way:\n\n${topic}`);
+
+    const userMessage = topic
+      ? `Please explain this topic to me in a clear and simple way:\n\n${topic}`
+      : `Please look at this image and explain the topic or content shown in it in a clear and simple way.`;
+
+    const explanation = await callClaude(systemPrompt, userMessage, capturedImageBase64, capturedImageMediaType);
     currentExplanation = explanation;
  
     explanationContent.innerHTML = explanation;
