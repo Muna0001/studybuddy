@@ -183,8 +183,9 @@ function handlePhotoSelected(e) {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-      capturedImageBase64 = jpegDataUrl.split(',')[1];
-      capturedImageMediaType = 'image/jpeg';
+      const [header, base64Data] = jpegDataUrl.split(',');
+      capturedImageBase64 = base64Data;
+      capturedImageMediaType = header.match(/data:([^;]+)/)[1];
       $('#photo-preview').src = jpegDataUrl;
       $('#photo-preview-wrap').classList.remove('hidden');
       $('#camera-btn').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Change Photo`;
