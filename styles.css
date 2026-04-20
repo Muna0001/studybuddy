@@ -698,6 +698,13 @@
     color: var(--error);
   }
    
+  .custom-bg-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+  }
+
   .api-key-btn {
     margin-top: 8px;
     border-color: var(--accent);

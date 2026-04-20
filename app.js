@@ -118,6 +118,10 @@ function bindEvents() {
   $('#font-decrease').addEventListener('click', () => changeFontSize(-1));
   $('#font-increase').addEventListener('click', () => changeFontSize(1));
  
+  // Custom background upload
+  $('#bg-upload').addEventListener('change', handleBgUpload);
+  $('#remove-custom-bg').addEventListener('click', removeCustomBg);
+
   // Reset theme
   $('#reset-theme').addEventListener('click', resetTheme);
  
@@ -582,11 +586,49 @@ function applyPresetTheme(themeName) {
 }
  
 function applyBackground(bgType) {
-  document.body.classList.remove('bg-gradient', 'bg-library', 'bg-coffee', 'bg-stars');
-  if (bgType !== 'solid') {
-    document.body.classList.add('bg-' + bgType);
+  document.body.classList.remove('bg-gradient', 'bg-library', 'bg-coffee', 'bg-stars', 'bg-custom');
+  if (bgType === 'custom') {
+    const saved = localStorage.getItem('studybuddy_custom_bg');
+    if (saved) {
+      document.body.style.backgroundImage = `url(${saved})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
+      document.body.classList.add('bg-custom');
+    }
+  } else {
+    document.body.style.backgroundImage = '';
+    document.body.style.backgroundSize = '';
+    document.body.style.backgroundPosition = '';
+    document.body.style.backgroundAttachment = '';
+    if (bgType !== 'solid') document.body.classList.add('bg-' + bgType);
   }
   localStorage.setItem('studybuddy_bg', bgType);
+  $('#remove-custom-bg').style.display = localStorage.getItem('studybuddy_custom_bg') ? 'inline-flex' : 'none';
+}
+
+function handleBgUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      localStorage.setItem('studybuddy_custom_bg', ev.target.result);
+    } catch {
+      alert('Image is too large to save. Please try a smaller image.');
+      return;
+    }
+    $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'custom'));
+    applyBackground('custom');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeCustomBg() {
+  localStorage.removeItem('studybuddy_custom_bg');
+  $('#bg-upload').value = '';
+  $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'solid'));
+  applyBackground('solid');
 }
  
 function setCustomColors({ accent, bg, text }) {
@@ -663,16 +705,16 @@ function loadTheme() {
   const savedBg = localStorage.getItem('studybuddy_bg');
   if (savedBg) {
     applyBackground(savedBg);
-    $$('.bg-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.bg === savedBg);
-    });
+    $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === savedBg));
   }
+  $('#remove-custom-bg').style.display = localStorage.getItem('studybuddy_custom_bg') ? 'inline-flex' : 'none';
 }
  
 function resetTheme() {
   localStorage.removeItem('studybuddy_theme');
   localStorage.removeItem('studybuddy_custom_colors');
   localStorage.removeItem('studybuddy_bg');
+  localStorage.removeItem('studybuddy_custom_bg');
   localStorage.removeItem('studybuddy_font_size');
  
   fontSize = 16;
