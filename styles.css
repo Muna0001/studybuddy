@@ -698,6 +698,17 @@
     color: var(--error);
   }
    
+  .api-key-btn {
+    margin-top: 8px;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .api-key-btn:hover {
+    border-color: var(--accent-hover);
+    color: var(--accent-hover);
+  }
+
   /* ---- Photo capture ---- */
 
   .photo-row {

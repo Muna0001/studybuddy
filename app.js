@@ -140,6 +140,7 @@ function bindEvents() {
 }
  
 function handleClearApiKey() {
+  themePanel.classList.remove('open');
   const previousKey = apiKey;
   history.pushState({ apiChange: true, previousKey }, '');
   apiKey = '';
