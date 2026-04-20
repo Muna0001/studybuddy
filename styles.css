@@ -698,11 +698,49 @@
     color: var(--error);
   }
    
-  .custom-bg-row {
+  .custom-bg-pill {
+    position: relative;
+    overflow: visible;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .custom-bg-pill #custom-bg-label {
+    display: block;
+    padding: 6px 12px;
+  }
+
+  .custom-bg-thumb {
+    width: 64px;
+    height: 28px;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .custom-bg-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .custom-bg-remove {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
     align-items: center;
+    justify-content: center;
+    z-index: 1;
   }
 
   .api-key-btn {

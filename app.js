@@ -120,7 +120,11 @@ function bindEvents() {
  
   // Custom background upload
   $('#bg-upload').addEventListener('change', handleBgUpload);
-  $('#remove-custom-bg').addEventListener('click', removeCustomBg);
+  $('#remove-custom-bg').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeCustomBg();
+  });
 
   // Reset theme
   $('#reset-theme').addEventListener('click', resetTheme);
@@ -604,7 +608,7 @@ function applyBackground(bgType) {
     if (bgType !== 'solid') document.body.classList.add('bg-' + bgType);
   }
   localStorage.setItem('studybuddy_bg', bgType);
-  $('#remove-custom-bg').style.display = localStorage.getItem('studybuddy_custom_bg') ? 'inline-flex' : 'none';
+  updateCustomBgPill();
 }
 
 function handleBgUpload(e) {
@@ -618,7 +622,8 @@ function handleBgUpload(e) {
       alert('Image is too large to save. Please try a smaller image.');
       return;
     }
-    $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'custom'));
+    $$('.bg-btn').forEach(b => b.classList.remove('active'));
+    $('#custom-bg-btn').classList.add('active');
     applyBackground('custom');
   };
   reader.readAsDataURL(file);
@@ -629,6 +634,15 @@ function removeCustomBg() {
   $('#bg-upload').value = '';
   $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === 'solid'));
   applyBackground('solid');
+}
+
+function updateCustomBgPill() {
+  const hasBg = !!localStorage.getItem('studybuddy_custom_bg');
+  $('#custom-bg-label').classList.toggle('hidden', hasBg);
+  $('#custom-bg-thumb').classList.toggle('hidden', !hasBg);
+  if (hasBg) {
+    $('#custom-bg-preview').src = localStorage.getItem('studybuddy_custom_bg');
+  }
 }
  
 function setCustomColors({ accent, bg, text }) {
@@ -707,7 +721,7 @@ function loadTheme() {
     applyBackground(savedBg);
     $$('.bg-btn').forEach(b => b.classList.toggle('active', b.dataset.bg === savedBg));
   }
-  $('#remove-custom-bg').style.display = localStorage.getItem('studybuddy_custom_bg') ? 'inline-flex' : 'none';
+  updateCustomBgPill();
 }
  
 function resetTheme() {

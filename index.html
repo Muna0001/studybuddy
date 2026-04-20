@@ -53,14 +53,14 @@
         <button class="bg-btn" data-bg="library">Cozy Library</button>
         <button class="bg-btn" data-bg="coffee">Coffee Shop</button>
         <button class="bg-btn" data-bg="stars">Starry Night</button>
-        <button class="bg-btn" data-bg="custom" id="custom-bg-btn">My Photo</button>
-      </div>
-      <div class="custom-bg-row">
-        <label for="bg-upload" class="btn secondary icon-text-btn" style="font-size:0.85em; padding: 6px 12px;">
-          Upload Image
+        <label id="custom-bg-btn" for="bg-upload" class="bg-btn custom-bg-pill">
+          <span id="custom-bg-label">Upload Image</span>
+          <div id="custom-bg-thumb" class="custom-bg-thumb hidden">
+            <img id="custom-bg-preview" alt="background preview">
+            <button id="remove-custom-bg" type="button" class="custom-bg-remove" aria-label="Remove">&times;</button>
+          </div>
         </label>
         <input type="file" id="bg-upload" accept="image/*" class="hidden">
-        <button id="remove-custom-bg" class="btn secondary" style="font-size:0.85em; padding:6px 12px; display:none;">Remove</button>
       </div>
     </div>
  
