@@ -167,33 +167,45 @@ window.addEventListener('popstate', (e) => {
 function handlePhotoSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => {
-      const MAX = 1600;
-      let w = img.naturalWidth;
-      let h = img.naturalHeight;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-      const [header, base64Data] = jpegDataUrl.split(',');
-      capturedImageBase64 = base64Data;
-      capturedImageMediaType = header.match(/data:([^;]+)/)[1];
-      $('#photo-preview').src = jpegDataUrl;
-      $('#photo-preview-wrap').classList.remove('hidden');
-      $('#camera-btn').classList.add('hidden');
-      $('#topic-input').closest('.textarea-wrap').classList.add('has-photo');
-    };
-    img.src = ev.target.result;
+
+  // Show preview immediately
+  const objectUrl = URL.createObjectURL(file);
+  $('#photo-preview').src = objectUrl;
+  $('#photo-preview-wrap').classList.remove('hidden');
+  $('#camera-btn').classList.add('hidden');
+  $('#topic-input').closest('.textarea-wrap').classList.add('has-photo');
+
+  // Convert to JPEG via canvas for API (handles HEIC and oversized images)
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 1600;
+    let w = img.naturalWidth;
+    let h = img.naturalHeight;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    const [header, base64Data] = jpegDataUrl.split(',');
+    capturedImageBase64 = base64Data;
+    capturedImageMediaType = header.match(/data:([^;]+)/)[1];
+    URL.revokeObjectURL(objectUrl);
   };
-  reader.readAsDataURL(file);
+  img.onerror = () => {
+    // Canvas conversion failed — read raw file as fallback
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const [header, base64Data] = ev.target.result.split(',');
+      capturedImageBase64 = base64Data;
+      capturedImageMediaType = file.type || 'image/jpeg';
+    };
+    reader.readAsDataURL(file);
+  };
+  img.src = objectUrl;
 }
 
 function clearPhoto() {
